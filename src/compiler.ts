@@ -1,4 +1,4 @@
-import { TextParser } from './parser/index'
+import { TextParser } from './parser'
 
 const isElement = node => node.nodeType === Node.ELEMENT_NODE
 const isTextNode = node => node.nodeType === Node.TEXT_NODE
