@@ -1,4 +1,4 @@
-import { TextParser } from './parser'
+import { TextParser, ModelParser } from './parser'
 
 const isElement = node => node.nodeType === Node.ELEMENT_NODE
 const isTextNode = node => node.nodeType === Node.TEXT_NODE
@@ -38,14 +38,27 @@ export default class Compiler {
   }
   compileNode(node) {
     if (isElement(node)) {
-      this.parseElement()
+      this.parseElement(node)
     }
     if (isTextNode(node)) {
       this.parseText(node)
     }
   }
-  parseElement() {}
+  parseElement(node) {
+    let attrs = node.attributes
+    for (let i = 0, l = attrs.length; i < l; i++) {
+      let attr = attrs[i]
+      switch (attr.name) {
+        case 'v-model': {
+          new ModelParser(this, node, attr.value)
+          continue
+        }
+        default:
+          continue
+      }
+    }
+  }
   parseText(node) {
-    new TextParser(this, node)
+    new TextParser(this, node, node.textContent)
   }
 }
