@@ -50,7 +50,10 @@ export default class Compiler {
       let attr = attrs[i]
       switch (attr.name) {
         case 'v-model': {
-          new ModelParser(this, node, attr.value)
+          new ModelParser(this, node, {
+            value: attr.value,
+            duplex: true
+          })
           continue
         }
         default:
@@ -59,6 +62,8 @@ export default class Compiler {
     }
   }
   parseText(node) {
-    new TextParser(this, node, node.textContent)
+    new TextParser(this, node, {
+      value: node.textContent
+    })
   }
 }

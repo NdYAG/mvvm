@@ -1,11 +1,12 @@
-import Watcher from '../watcher'
+import Watcher from '../observer/watcher'
 
 export default abstract class Parser {
-  constructor(public vm, public node: Node, public directive: String) {
+  public watcher: Watcher
+  constructor(public vm, public node: Node, public directive: Directive) {
     let expression = this.parse()
-    let watcher = new Watcher(vm, expression)
-    this.update(watcher.value)
+    this.watcher = new Watcher(vm, expression, this.update, this)
+    this.update(this.watcher.value)
   }
-  abstract parse(): String
+  abstract parse(): Expression
   abstract update(value: any): void
 }
