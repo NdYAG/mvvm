@@ -1,11 +1,19 @@
 import Dependency from './dependency'
+import { parse } from './ast-compiler'
 
 function createFunction(expression) {
   return new Function(`with(this) {return ${expression}}`)
 }
 
-function createSetter(expression) {
-  return new Function('value', `with(this) {${expression} = value}`)
+function createSetter(scope, expression) {
+  let result = parse(expression)
+  return function (value) {
+    if (result.object !== 'scope') {
+      scope[result.object][result.property] = value
+    } else {
+      scope[result.property] = value
+    }
+  }
 }
 
 let id = 0
@@ -23,7 +31,7 @@ export default class Watcher {
   ) {
     this.id = id++
     this.getter = createFunction(expression.value)
-    this.setter = expression.duplex ? createSetter(expression.value) : null
+    this.setter = expression.duplex ? createSetter(vm.model, expression.value) : null
     this.value = this.get()
   }
   get() {
@@ -33,7 +41,7 @@ export default class Watcher {
     return value
   }
   set(value) {
-    this.setter.call(this.vm.model, value)
+    this.setter(value)
   }
   update(val) {
     let newValue = this.get()
